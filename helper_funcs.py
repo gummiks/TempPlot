@@ -6,9 +6,27 @@ import matplotlib.pyplot as plt
 import time
 import HTML
 
+# uncomment to do today (will need datafile until today)
+#TODAY = time.strftime("%Y-%m-%d")
+# force today to be a specific date
+TODAY = '2017-01-30'
+
 def create_total_dataset(path_to_archive,total_save_name,summary_name):
     """A function that reads all the data-files in 'path_to_archive' one by one,
-    and saves them in one file called: 'total_save_name'"""
+    and saves them in one file called: 'total_save_name' (LakeSHoreLogTotal.txt)
+
+    INPUT:
+        path_to_archive:
+        total_save_name: name of file to save
+        summary_name: name of file to save summary file, containing the dates and number of records per day
+            - see read_summary()
+
+    RETURNS:
+        - nothing -
+
+    EXAMPLE:
+        create_total_dataset("archive/",total_save_name,summary_name)
+    """
     print("Using create_total_dataset")
     bashCommand = "ls archive/" 
     process = subprocess.Popen(bashCommand.split(), stdout=subprocess.PIPE)
@@ -52,7 +70,15 @@ def create_total_dataset(path_to_archive,total_save_name,summary_name):
     pass
 
 def read_total_dataset(total_save_name,numtime=1):
-    """Read total_save_name, and returns a data construct with all the temperature data, and times, where 0 = NaN"""
+    """Read total_save_name, and returns a data object with all the temperature data, and times, where 0 = NaN
+
+    INPUT:
+        total_save_name: name of file to read
+        numtime: if numtime is True, then infer the timestamp
+    
+    RETURNS:
+        data 
+    """
     if numtime==1:
         data=np.genfromtxt(total_save_name,dtype=None,usemask=True,missing_values="0.0",converters={0:mdates.strpdate2num('%Y-%m-%d--%H:%M:%S')})
         data=data.filled(np.nan)
@@ -63,10 +89,17 @@ def read_total_dataset(total_save_name,numtime=1):
     return data
 
 def read_summary(summary_name):
-    """Reads and returns the data in the summary file (good for knowing the number of records per day)
-    data['f0'] contains the date number
-    data['f1'] contains the date
-    data['f2'] contains the number of records for that date
+    """
+    Reads and returns the data in the summary file (good for knowing the number of records per day)
+
+    INPUT:
+        summary_name: the name of the summary file
+
+    RETURNS:
+    data
+        data['f0'] contains the date number
+        data['f1'] contains the date
+        data['f2'] contains the number of records for that date
     """
     return np.genfromtxt(summary_name,dtype=None)
 
@@ -110,7 +143,15 @@ def config_matplotlib_yale():
     pass
 
 def plot_all_dataset(total_save_name):
-    """Plot all the dataset in LakeShoreLogTotal.txt"""
+    """
+    Plot all the dataset in LakeShoreLogTotal.txt
+
+    INPUT:
+        total_save_name: "LakeShoreLogTotal.txt"
+
+    RETURNS:
+        plots the data, and prints statistics
+    """
     #Read the data in LakeShoreLogTotal.txt
     data = read_total_dataset(total_save_name)
 
@@ -151,23 +192,34 @@ def plot_all_dataset(total_save_name):
     pass
 
 def plot_all_dataset_jan(total_save_name):
-    """Plot all the dataset in LakeShoreLogTotal.txt from Jan 10th (first day in Jan with data) to present day"""
+    """
+    Plot all the dataset in LakeShoreLogTotal.txt from Jan 10th (first day in Jan with data) to present day
+    
+    INPUT:
+        total_save_name: "LakeShoreLogTotal.txt"
+
+    RETURNS:
+        plots the data, and prints statistics
+    
+    """
     #Read the data in LakeShoreLogTotal.txt
 
     jandate = '2015-01-10'
-    today = time.strftime("%Y-%m-%d")
-    #today = '2016-11-30'
+    #TODAY = time.strftime("%Y-%m-%d")
+    #TODAY = '2016-11-30'
 
-    print("\nPlotting data from january 10, to " + today)
+    print("\nPlotting data from january 10, to " + TODAY)
     try:
-        plot_dates(total_save_name,jandate,today,outputname_single=True)
+        plot_dates(total_save_name,jandate,TODAY,outputname_single=True)
     except TypeError:
-        print "Date " + today + " not in dataset! Try to rerun"
+        print "Date " + TODAY + " not in dataset! Try to rerun"
     ##fig.show()
     pass
 
 def get_date_data(total_save_name,date1,date2=False):
-    """Get and return the data between date1 and date2 (both included)"""
+    """
+    Get and return the data between date1 and date2 (both included)
+    """
 
     summary_data = read_summary("LakeShoreLogSummary.txt")
     date_number = summary_data['f0']
@@ -201,7 +253,15 @@ def get_date_data(total_save_name,date1,date2=False):
         return data_requested
 
 def plot_all_dataset_yale(total_save_name):
-    """Plot all the dataset in LakeShoreLogTotal.txt"""
+    """
+    Plot all the dataset in LakeShoreLogTotal.txt, configured for the Yale Conference Poster.
+
+    INPUT:
+        total_save_name: "LakeShoreLogTotal.txt"
+
+    RETURNS:
+        plots the data, and prints statistics
+    """
     #Read the data in LakeShoreLogTotal.txt
     data = read_total_dataset(total_save_name)
 
@@ -242,7 +302,18 @@ def plot_all_dataset_yale(total_save_name):
     pass
 
 def plot_dates(total_save_name,date1,date2=False,outputname_special=False,outputname_single=False):
-    """Plot the temperature data for a given date: YYYY-MM-DD, and save to a file"""
+    """
+    Plot the temperature data for a given date: YYYY-MM-DD, and save to a file
+    
+    INPUT:
+        total_save_name: "LakeShoreLogTotal.txt"
+        date1:
+        date2:
+
+
+    RETURNS:
+        plots the data, and prints statistics
+    """
 
     #Read the data in LakeShoreLogTotal.txt
     data = get_date_data(total_save_name,date1,date2)
@@ -301,7 +372,9 @@ def plot_dates(total_save_name,date1,date2=False,outputname_special=False,output
     pass
 
 def plot_dates_yale(total_save_name,date1,date2=False,outputname_special=False):
-    """Plot the temperature data for a given date: YYYY-MM-DD, and save to a file"""
+    """
+    Plot the temperature data for a given date: YYYY-MM-DD, and save to a file, config for Yale Conference.
+    """
 
     #Read the data in LakeShoreLogTotal.txt
     data = get_date_data(total_save_name,date1,date2)
@@ -357,13 +430,17 @@ def plot_dates_yale(total_save_name,date1,date2=False,outputname_special=False):
 def plot_today(total_save_name):
     """Plot the temperature data for today (computer time)"""
     #Read the data in LakeShoreLogTotal.txt
-    today = time.strftime("%Y-%m-%d")
-    #today = '2016-11-30'
-    print("\nPlotting data from today, " + today)
+
+    # uncomment to do today (will need datafile until today)
+    #TODAY = time.strftime("%Y-%m-%d")
+
+    # force today to be a specific date
+    #TODAY = '2017-01-30'
+    print("\nPlotting data from today, " + TODAY)
     try:
-        plot_dates(total_save_name,today,outputname_special="today")
+        plot_dates(total_save_name,TODAY,outputname_special="today")
     except TypeError:
-        print "Date " + today + " not in dataset! Try to rerun"
+        print "Date " + TODAY + " not in dataset! Try to rerun"
 
 
 def plot_week(total_save_name):
@@ -382,7 +459,7 @@ def plot_week(total_save_name):
         print "Date " + date2 + " not in dataset! Try to rerun"
 
 def plot_month(total_save_name):
-    """Plots the last 7 days"""
+    """Plots the last 30 days"""
     summary_data = read_summary('LakeShoreLogSummary.txt')
     date_number = summary_data['f0']
     dates = summary_data['f1']
@@ -397,8 +474,17 @@ def plot_month(total_save_name):
         print "Date " + date2 + " not in dataset! Try to rerun"
 
 def calc_stat_summary(dataset,output_filename):
-    """A program that calculates summary statistics for a given dataset and outputs it
-    to the file 'output_filename'. Dataset is of the form data['f0'] etc."""
+    """
+    A function that calculates summary statistics for a given dataset and outputs it
+    to the file 'output_filename'. Dataset is of the form data['f0'] etc.
+    
+    INPUT:
+        dataset: data
+        output_filename: filename of output file
+
+    RETURNS:
+        writes a html table
+    """
 
     d_mean  = np.zeros(7)
     d_std   = np.zeros(7)
@@ -451,19 +537,3 @@ def txt2html(input_filename,output_filename):
 def num2str(num,precision):
     """docstring for num2str"""
     return "%0.*f" % (precision,num)
-
-#def get_date_data(date,total_save_name):
-#    """Get and return the data for a given date"""
-#    data_num_formatted = read_total_dataset(total_save_name,1)
-#    data_date_formatted = read_total_dataset(total_save_name,0)
-#    data_length = len(data_date_formatted['f0'])
-#    indices = np.zeros(data_length)
-#    dates_stripped = data_date_formatted['f0']
-#    for i in range(data_length):
-#        dates_stripped[i] = dates_stripped[i][-20:-10]
-#    
-#    data_requested = data_num_formatted[dates_stripped==date]
-#
-#    print("Length of data requested: ", len(data_requested))
-#
-#    return data_requested
