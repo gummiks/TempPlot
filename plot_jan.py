@@ -1,0 +1,29 @@
+#!/usr/bin/python
+# -*- coding: utf-8 -*-
+# File: thermal_encl_temps.py
+# Created: 2014-11-14 by gks 
+"""
+Description: A script to plot the temp data
+"""
+import sys
+from pylab import *
+from scipy import *
+import helper_funcs as hf
+reload(hf)
+
+total_save_name = "LakeShoreLogTotal.txt"
+summary_name = "LakeShoreLogSummary.txt"
+
+hf.create_total_dataset("archive/",total_save_name,summary_name)
+
+hf.config_matplotlib()
+
+hf.plot_all_dataset_jan(total_save_name)
+
+hf.plot_today(total_save_name)
+
+hf.plot_week(total_save_name)
+
+hf.plot_month(total_save_name)
+
+#helper_funcs.plot_dates(total_save_name,'2014-11-15','2014-11-16')
